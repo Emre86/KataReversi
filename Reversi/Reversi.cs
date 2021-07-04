@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Principal;
 
 namespace Reversi
@@ -7,20 +8,26 @@ namespace Reversi
     public class Reversi
     {
         private readonly string emptyCell = ". ";
+        private readonly int _sideLength = 8;
         private string _activePlayer = "B ";
-
-        private int _sideLength = 8;
-        //private string passivePlayer = "W ";
-        private string [,]GridReversi = new string [8, 8];
+        private string[,] _gridReversi;
         private Dictionary<string, int> _charactersPosition;
         private Dictionary<int, string> _positionCharacters;
+        private List<List<string>> _gameOrientation;
         
         public Reversi()
         {
-            this.InitCharactersPosition();
-            this.InitGridReversi();
+          
         }
 
+        public void Init()
+        {
+            this.InitCharactersPosition();
+            this.InitGridReversi();
+            this._gridReversi = new string [this._sideLength, this._sideLength];
+            this._gameOrientation = new List<List<string>>();
+        }
+        
         private void InitCharactersPosition()
         {
             this._charactersPosition = new Dictionary<string, int>(){
@@ -52,14 +59,14 @@ namespace Reversi
             {
                 for (int jj = 0; jj < this._sideLength; jj++)
                 {
-                    this.GridReversi[ii, jj] = emptyCell;
+                    this._gridReversi[ii, jj] = emptyCell;
                 }
             }
 
-            this.GridReversi[this._charactersPosition["D"], 3] = "W ";
-            this.GridReversi[this._charactersPosition["E"], 4] = "W ";
-            this.GridReversi[this._charactersPosition["D"], 4] = this._activePlayer;
-            this.GridReversi[this._charactersPosition["E"], 3] = this._activePlayer;
+            this._gridReversi[this._charactersPosition["D"], 3] = "W ";
+            this._gridReversi[this._charactersPosition["E"], 4] = "W ";
+            this._gridReversi[this._charactersPosition["D"], 4] = this._activePlayer;
+            this._gridReversi[this._charactersPosition["E"], 3] = this._activePlayer;
         }
 
         public void DisplayGridReversi()
@@ -70,35 +77,17 @@ namespace Reversi
                 Console.Write(this._positionCharacters[ii]);
                 for (int jj = 0; jj < this._sideLength; jj++)
                 {
-                    Console.Write(this.GridReversi[ii,jj]);
+                    Console.Write(this._gridReversi[ii,jj]);
                 }
                 Console.WriteLine("");
             }
         }
 
-        private List<string> GetLine(int startColumn, int endColumn, int positionLine)
-        {
-            //string[] lineArray = new string[] {};
-            List<string> subGridReversi = new List<string>();
-            for (int ii = startColumn; ii < endColumn; ii++)
-            {
-                subGridReversi.Add(this.GridReversi[positionLine, ii]);
-            }
-            return subGridReversi;
-        }
+       
 
-        private List<string> GetColumn(int startLine, int endLine, int positionColumn)
-        {
-            //string[] columnArray = new string[] {};
-            List<string> subGridReversi = new List<string>();
-            for (int ii = startLine; ii < endLine; ii++)
-            {
-                subGridReversi.Add(this.GridReversi[ii, positionColumn]);
-            }
-            return subGridReversi;
-        }
+       
 
-        private List<string> GetDiagonal(int positionLine, int positionColumn, int orientationLine, int orientationColumn)
+        private List<string> GetSubGridReversi(int positionLine, int positionColumn, int orientationLine, int orientationColumn)
         {
             int nextPositionLine = positionLine + orientationLine;
             int nextPositionColumn = positionColumn + orientationColumn;
@@ -108,31 +97,28 @@ namespace Reversi
             while (nextPositionLine < this._sideLength && nextPositionLine > 0 && nextPositionColumn < this._sideLength && nextPositionColumn > 0)
             {
                 //subArray[ii] = this.GridReversi[nextPositionLine, nextPositionColumn];
-                subGridReversi.Add(this.GridReversi[nextPositionLine, nextPositionColumn]);
+                subGridReversi.Add(this._gridReversi[nextPositionLine, nextPositionColumn]);
                 nextPositionLine = nextPositionLine + orientationLine;
                 nextPositionColumn = nextPositionColumn + orientationColumn;
             }
             return subGridReversi;
         }
 
-        private List<string> GetGrid(int positionLine, int positionColumn, int orientationLine, int orientationColumn)
+        private void PlayGrid(int positionLine, int positionColumn, int orientationLine, int orientationColumn)
         {
             int nextPositionLine = positionLine + orientationLine;
             int nextPositionColumn = positionColumn + orientationColumn;
-            //string[] subArray = new string[] {};
-            List<string> subGridReversi = new List<string>();
-            //int ii = 0;
             while (nextPositionLine < this._sideLength && nextPositionLine > 0 && nextPositionColumn < this._sideLength && nextPositionColumn > 0)
             {
-                //subArray[ii] = this.GridReversi[nextPositionLine, nextPositionColumn];
-                subGridReversi.Add(this.GridReversi[nextPositionLine, nextPositionColumn]);
+                if (this._gridReversi[nextPositionLine, nextPositionColumn].Equals(emptyCell))
+                {
+                    break;
+                }
+                this._gridReversi[nextPositionLine, nextPositionColumn] = this._activePlayer;
                 nextPositionLine = nextPositionLine + orientationLine;
                 nextPositionColumn = nextPositionColumn + orientationColumn;
             }
-            return subGridReversi;
         }
-
-        
         
         private bool CheckValid(List<string> subGridReversi)
         {
@@ -158,46 +144,29 @@ namespace Reversi
         
         public bool CheckValidStroke(string character, int chiffre)
         {
-            
-            Console.WriteLine(character);
-            Console.WriteLine(chiffre);
             int positionLine = this._charactersPosition[character];
             int positionColumn = chiffre - 1;
             bool isValid = false;
-            bool isValidCurrentPosition = this.GridReversi[positionLine, positionColumn].Equals(emptyCell);
-            // bool checkValidLineOrdered = CheckLineOrdered(abscisse, ordonne + 1);
-            // bool checkValidLineReversed = CheckLineReversed(abscisse, ordonne - 1);
-            // bool checkValid = checkValidLineOrdered || checkValidLineReversed;
+            bool isValidCurrentPosition = this._gridReversi[positionLine, positionColumn].Equals(emptyCell);
+          
             if (isValidCurrentPosition)
             {
-                List<string> lineRight = GetLine(positionColumn + 1, this._sideLength, positionLine);
-                List<string> lineLeft = GetLine(0, positionColumn - 1, positionLine);
-                List<string> columnTop = GetColumn(0, positionLine - 1, positionColumn);
-                List<string> columnBottom = GetColumn(positionLine + 1, this._sideLength, positionColumn);
-                List<string> topLeft = GetDiagonal(positionLine, positionColumn, -1, -1);
-                List<string> topRight =  GetDiagonal(positionLine, positionColumn, -1, 1);
-                List<string> bottomLeft = GetDiagonal(positionLine, positionColumn, 1, -1);
-                List<string> bottomRight =  GetDiagonal(positionLine, positionColumn, 1, 1);
-                lineLeft.Reverse();
-                columnTop.Reverse();
+                List<string> lineRight = GetSubGridReversi(positionLine, positionColumn,  0, 1);
+                List<string> lineLeft = GetSubGridReversi(positionLine, positionColumn, 0, -1);
+                List<string> columnTop = GetSubGridReversi(positionLine, positionColumn, -1,0);
+                List<string> columnBottom = GetSubGridReversi(positionLine, positionColumn, 1, 0) ;
+                List<string> diagonalTopLeft = GetSubGridReversi(positionLine, positionColumn, -1, -1);
+                List<string> diagonalTopRight = GetSubGridReversi(positionLine, positionColumn, -1, 1);
+                List<string> diagonalBottomLeft = GetSubGridReversi(positionLine, positionColumn, 1, -1);
+                List<string> diagonalBottomRight =  GetSubGridReversi(positionLine, positionColumn, 1, 1);
                 
-                List<string> lineRight2 = GetLine(positionColumn + 1, this._sideLength, positionLine);
-                List<string> lineLeft2 = GetLine(0, positionColumn - 1, positionLine);
-                List<string> columnTop2 = GetColumn(0, positionLine - 1, positionColumn);
-                List<string> columnBottom2 = GetColumn(positionLine + 1, this._sideLength, positionColumn);
-                List<string> topLeft2 = GetDiagonal(positionLine, positionColumn, -1, -1);
-                List<string> topRight2 =  GetDiagonal(positionLine, positionColumn, -1, 1);
-                List<string> bottomLeft2 = GetDiagonal(positionLine, positionColumn, 1, -1);
-                List<string> bottomRight2 =  GetDiagonal(positionLine, positionColumn, 1, 1);
-                
-
-                List<List<string>> gameOrientation = new List<List<string>> { lineRight, lineLeft, columnTop, columnBottom, topLeft, topRight, bottomLeft, bottomRight };
+                List<List<string>> gameOrientation = new List<List<string>> { lineRight, lineLeft, columnTop, columnBottom, diagonalTopLeft, diagonalTopRight, diagonalBottomLeft, diagonalBottomRight };
                 foreach (List<string> orientation in gameOrientation)
                 {
                     if (CheckValid(orientation))
                     {
                         isValid = true;
-                        break;
+                        this._gameOrientation.Add(orientation);
                     }
                 }
             }
@@ -207,14 +176,51 @@ namespace Reversi
 
         public void PlayStroke(string character, int chiffre)
         {
-            int abscisse = this._charactersPosition[character];
-            int ordonne = chiffre - 1;
-            this.GridReversi[abscisse, ordonne] = this._activePlayer;
-            // PlayLineOrdered(abscisse, ordonne + 1);
-            // PlayLineReversed(abscisse, ordonne - 1);
-            this._activePlayer = this._activePlayer.Equals("B ") ? "W " : "B ";
+            // int abscisse = this._charactersPosition[character];
+            // int ordonne = chiffre - 1;
+            // this._gridReversi[abscisse, ordonne] = this._activePlayer;
+            //
+            // this._activePlayer = this._activePlayer.Equals("B ") ? "W " : "B ";
         }
         
+        // private List<string> GetLine(int startColumn, int endColumn, int positionLine)
+        // {
+        //     //string[] lineArray = new string[] {};
+        //     List<string> subGridReversi = new List<string>();
+        //     for (int ii = startColumn; ii < endColumn; ii++)
+        //     {
+        //         subGridReversi.Add(this.GridReversi[positionLine, ii]);
+        //     }
+        //     return subGridReversi;
+        // }
+        //
+        // private List<string> GetColumn(int startLine, int endLine, int positionColumn)
+        // {
+        //     //string[] columnArray = new string[] {};
+        //     List<string> subGridReversi = new List<string>();
+        //     for (int ii = startLine; ii < endLine; ii++)
+        //     {
+        //         subGridReversi.Add(this.GridReversi[ii, positionColumn]);
+        //     }
+        //     return subGridReversi;
+        // }
+        
+        // private List<string> GetDiagonal(int positionLine, int positionColumn, int orientationLine, int orientationColumn)
+        // {
+        //     int nextPositionLine = positionLine + orientationLine;
+        //     int nextPositionColumn = positionColumn + orientationColumn;
+        //     //string[] subArray = new string[] {};
+        //     List<string> subGridReversi = new List<string>();
+        //     //int ii = 0;
+        //     while (nextPositionLine < this._sideLength && nextPositionLine > 0 && nextPositionColumn < this._sideLength && nextPositionColumn > 0)
+        //     {
+        //         //subArray[ii] = this.GridReversi[nextPositionLine, nextPositionColumn];
+        //         subGridReversi.Add(this.GridReversi[nextPositionLine, nextPositionColumn]);
+        //         nextPositionLine = nextPositionLine + orientationLine;
+        //         nextPositionColumn = nextPositionColumn + orientationColumn;
+        //     }
+        //     return subGridReversi;
+        // }
         
         // private string[] GetDiagonalBasDroite(int positionLine, int positionColumn)
         // {
