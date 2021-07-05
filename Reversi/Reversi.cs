@@ -120,7 +120,6 @@ namespace Reversi
             bool hasTokenPassivePlayer = false;
             foreach (string boxValue in subGridReversi)
             {
-                Console.Write(boxValue);
                 if (boxValue.Equals(emptyCell))
                 {
                     break;
@@ -183,7 +182,6 @@ namespace Reversi
             {
                 PlayGrid(positionLine, positionColumn, orientation.Item1, orientation.Item2);
             }
-            
             this._activePlayer = this._activePlayer.Equals("B ") ? "W " : "B ";
         }
         
