@@ -6,28 +6,14 @@ namespace Reversi
     {
         static void Main(string[] args)
         {
-            string[,] gridReversi = new string[8, 8] { 
-                { ". ", ". ", "B ", "W ", ". ", "B ", ". ", ". "}, 
-                { "W ", "W ", "B ", "B ", "B ", "B ", "B ", "B "},
-                { ". ", "W ", "B ", "B ", "B ", ". ", ". ", ". "},
-                { ". ", "B ", "B ", "B ", "B ", ". ", ". ", ". "},
-                { "B ", "B ", "B ", "B ", "B ", ". ", ". ", ". "},
-                { ". ", "B ", "W ", "W ", "B ", ". ", ". ", ". "},
-                { "B ", "W ", ". ", "W ", ". ", ". ", ". ", ". "},
-                { ". ", ". ", ". ", ". ", ". ", ". ", ". ", ". "}
-                };
-            string activePlayer = "W ";
-            
-            
             Console.WriteLine("Start playing!");
-            //Reversi reversi = new Reversi();
-            Reversi reversi = new Reversi(gridReversi, activePlayer);
+            Reversi reversi = new Reversi();
             do
             {
                 reversi.DisplayGridReversi();
-                Console.WriteLine("Entrez une lettre entre A et H");
+                Console.WriteLine("Entrez une lettre entre A et H :");
                 string inputCharacter = Console.In.ReadLine();
-                Console.WriteLine("Entrez un chiffre entre 1 et 8");
+                Console.WriteLine("Entrez un chiffre entre 1 et 8 :");
                 string inputDigit = Console.In.ReadLine();
                 if (string.IsNullOrEmpty(inputCharacter) || inputCharacter.Length > 1 || string.IsNullOrEmpty(inputDigit) || inputDigit.Length > 1)
                 {

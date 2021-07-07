@@ -5,9 +5,9 @@ namespace Reversi
 {
     public class Reversi
     {
-        private readonly string emptyCell = ". ";
+        private readonly string emptyCell = ".";
         private readonly int _sideLength = 8;
-        private string _activePlayer = "B ";
+        private string _activePlayer = "B";
         private string[,] _gridReversi;
         private Dictionary<string, int> _charactersPosition;
         private Dictionary<int, string> _positionCharacters;
@@ -78,8 +78,8 @@ namespace Reversi
                 }
             }
 
-            this._gridReversi[this._charactersPosition["D"], 3] = "W ";
-            this._gridReversi[this._charactersPosition["E"], 4] = "W ";
+            this._gridReversi[this._charactersPosition["D"], 3] = "W";
+            this._gridReversi[this._charactersPosition["E"], 4] = "W";
             this._gridReversi[this._charactersPosition["D"], 4] = this._activePlayer;
             this._gridReversi[this._charactersPosition["E"], 3] = this._activePlayer;
         }
@@ -93,7 +93,7 @@ namespace Reversi
                 Console.Write(this._positionCharacters[ii]);
                 for (int jj = 0; jj < this._sideLength; jj++)
                 {
-                    Console.Write(this._gridReversi[ii,jj]);
+                    Console.Write($"{this._gridReversi[ii,jj]} ");
                 }
                 Console.WriteLine("");
             }
@@ -182,7 +182,7 @@ namespace Reversi
             {
                 PlayGrid(positionLine, positionColumn, orientation.Item1, orientation.Item2);
             }
-            this._activePlayer = this._activePlayer.Equals("B ") ? "W " : "B ";
+            this._activePlayer = this._activePlayer.Equals("B") ? "W" : "B";
         }
         
     }
